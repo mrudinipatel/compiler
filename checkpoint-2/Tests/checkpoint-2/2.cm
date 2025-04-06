@@ -1,0 +1,24 @@
+/*
+ * 2.cm demonstrates a CM file with array errors.
+ * This is expected to display a relevant compilation error.
+*/
+
+void nothing(void) {
+    
+}
+
+int five(void) {
+    return 5;
+}
+
+int main(void) {
+    int x[10];
+
+    x[0] = nothing();   /* error: cannot assign void to int array */
+    x[nothing()] = 1;   /* error: cannot index an array with a void expression */
+
+    /* These are all valid integer expressions */
+    x[five()] = 5;
+    x[0] = five() + 5 - 42 / five() * 9;
+    x[five()/2] = 2;
+}

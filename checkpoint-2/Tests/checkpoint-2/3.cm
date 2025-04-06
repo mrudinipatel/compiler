@@ -1,0 +1,37 @@
+/*
+ * 3.cm demonstrates a CM file with invalid if and
+ * while conditions. This is expected to display relevant
+ * compilation errors.
+*/
+
+void nothing(void) { 
+
+}
+
+int zero(void) {
+    return 0;
+}
+
+int main(void) {
+    int x;
+    int y;
+
+    x = 5;
+    y = 4;
+
+    /* error: cannot divide any integer by void */
+    while (x < y/nothing()) { 
+        output(3);
+        x = x + 1;
+    }
+
+    /* error: cannot compare an integer with void */
+    if (x - 2 < nothing()) { 
+        output(2);
+    }
+
+    /* error: cannot use a void expression as an if-condition */
+    if (nothing()) {
+        output(1);
+    }
+}

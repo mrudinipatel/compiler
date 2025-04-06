@@ -1,0 +1,29 @@
+/*
+ * This test file produces the following syntax and semantic errors:
+ * 1. While condition tries comparing an array with int (e.g., type mismatch)
+ * 2. If condition tries comparing an array with int (e.g., type mismatch)
+ * 3. Array index is not an int type
+ * 4. Return type does not match function type
+*/
+
+void main(void){
+	int a[2]; int b;
+	bool c;
+	b = 1;
+
+    /* comparing array with an int */
+	while(a >= b){
+        output(b);
+    }
+
+    /* comparing array with an int */
+	if (a < b){
+		output(a);
+    }
+
+    /* Array index is not int */
+	a[c] = 2;
+
+    /* return type mismatch*/
+	return b;
+}

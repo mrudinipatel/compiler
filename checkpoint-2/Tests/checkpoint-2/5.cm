@@ -1,0 +1,64 @@
+/*
+ * 5.cm demonstrates a wide variety of CM file errors as 5.cm has no limit.
+ * Please refer to the comments below for each existing CM file error.
+ * Please note: these tests are derived directly from the provided rubric.
+*/
+
+void nothing(void) {
+
+}
+
+int zero(void) {
+    return 0;
+}
+
+int fun(int fff ) {
+    int x; int y;
+    x = x * 2 + 1;
+
+    /* error: expected an integer expression after the '+' symbol */
+    y = x + nothing();
+}
+
+int oneArg(int x) {
+    return x;
+}
+
+int twoArg(int x, int y) {
+    return x + y;
+}
+
+/* error: cannot return integer from a void type function */
+void returnsVoid(void) {
+    return 1;
+}
+
+void test(void) {
+    int x;
+
+    /* error: too many args for the oneArg function */
+    x = oneArg(1, 2);
+
+    /* error: missing an arg for the oneArg function */
+    x = oneArg();
+
+    /* error: missing an arg for the twoArg function */
+    x = twoArg(1);
+}
+
+void main(void) {
+    int a[2];  int x;
+    a[x] = 1;
+
+    /* error: cannot index an array using void */
+    a[nothing()] = 2;
+
+    /* error: cannot assign void to an integer symbol */
+    x = nothing();
+    
+    int x;
+    if( x ) output(nothing());
+    if(nothing()) output(x, nothing());
+}
+
+

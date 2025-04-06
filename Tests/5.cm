@@ -1,0 +1,30 @@
+/*
+ * This test file produces the following syntax and semantic errors:
+ * 1. Incorrect number of arguments for the function calls
+ * 2. Calling a function in Main method, which is defined after the Main method itself
+*/
+
+int returnInteger(int value){
+	int returnValue;
+	returnValue = value * 5;
+	returnValue = returnValue / value;
+
+	return returnValue;
+}
+
+void main(void){
+	int sufficient;
+	int insufficient;
+	sufficient = returnInteger(2);
+
+  /* There should only be 1 argument */
+	insufficient = returnInteger(sufficient, sufficient);
+
+  /* Undefined function call, because it is defined after main */
+	insufficient = invalidFunction();
+}
+
+/* Main should be the last function */
+int invalidFunction(void){
+	return 3;
+}

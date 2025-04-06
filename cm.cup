@@ -1,0 +1,386 @@
+/*
+  Created by: Group 5
+  File Name: cm.cup
+*/
+   
+   
+/* ----------------------Preliminary Declarations Section--------------------*/
+   
+import absyn.*;
+   
+/* Parser code to change the way the parser reports errors (include
+   line and column number of the error). */
+parser code {:
+    
+    /* Change the method report_error so it will display the line and
+       column of where the error occurred in the input as well as the
+       reason for the error which is passed into the method in the
+       String 'message'. */
+    public void report_error(String message, Object info) {
+   
+        /* Create a StringBuffer called 'm' with the string 'Error' in it. */
+        StringBuffer m = new StringBuffer("Error");
+   
+        /* Check if the information passed to the method is the same
+           type as the type java_cup.runtime.Symbol. */
+        if (info instanceof java_cup.runtime.Symbol) {
+            /* Declare a java_cup.runtime.Symbol object 's' with the
+               information in the object info that is being typecasted
+               as a java_cup.runtime.Symbol object. */
+            java_cup.runtime.Symbol s = ((java_cup.runtime.Symbol) info);
+   
+            /* Check if the line number in the input is greater or
+               equal to zero. */
+            if (s.left >= 0) {                
+                /* Add to the end of the StringBuffer error message
+                   the line number of the error in the input. */
+                m.append(" in line "+(s.left+1));   
+                /* Check if the column number in the input is greater
+                   or equal to zero. */
+                if (s.right >= 0)                    
+                    /* Add to the end of the StringBuffer error message
+                       the column number of the error in the input. */
+                    m.append(", column "+(s.right+1));
+            }
+        }
+   
+        /* Add to the end of the StringBuffer error message created in
+           this method the message that was passed into this method. */
+        m.append(" : "+message);
+   
+        /* Print the contents of the StringBuffer 'm', which contains
+           an error message, out on a line. */
+        System.err.println(m);
+    }
+   
+    /* Change the method report_fatal_error so when it reports a fatal
+       error it will display the line and column number of where the
+       fatal error occurred in the input as well as the reason for the
+       fatal error which is passed into the method in the object
+       'message' and then exit.*/
+    public void report_fatal_error(String message, Object info) {
+        report_error(message, info);
+        System.exit(1);
+    }
+
+    /* Assume true at the start, but set to false with parsing errors */
+    public static boolean valid = true;
+:};
+   
+   
+/* ------------Declaration of Terminals and Non Terminals Section----------- */
+   
+terminal IF, ELSE;
+terminal ASSIGN, EQ, LT, GT, PLUS, MINUS, TIMES, OVER, LPAREN, RPAREN, SEMI;
+terminal String ID, NUM, TRUTH;
+terminal ERROR; 
+terminal BOOL, INT, RETURN, VOID, WHILE, TRUE, FALSE, LEQT, GEQT, NEQ, UBW, OR, AND, COMMA, LBRACK, RBRACK, LBRACE, RBRACE;
+
+non terminal ExpList program, declaration_list, param_list, params, statement_list, local_declarations, arg_list, args;
+non terminal Exp declaration, var_declaration, fun_declaration, fun_prototype, param, compound_stmt, statement, expression_stmt, selection_stmt, iteration_stmt, return_stmt, expression, var, call;
+non terminal NodeType type_specifier; 
+
+precedence nonassoc LT, GT, LEQT, GEQT;
+precedence nonassoc EQ, NEQ;
+precedence left PLUS, MINUS;
+precedence left TIMES, OVER; 
+precedence left OR, AND;
+precedence left ELSE;
+precedence left SEMI;
+precedence left LPAREN;
+
+/* ----------------------------Grammar Section-------------------- */
+   
+start with program;
+
+program ::= declaration_list:dl
+            {: RESULT = dl; :}
+         ;
+
+declaration_list ::= declaration_list:dl declaration:d 
+                  {:ExpList t = dl; //loop to end of dl then add d to tail
+                     while(t.tail != null)
+                     {
+                        t = t.tail;
+                     }
+                     t.tail = new ExpList(d, null);
+                     RESULT = dl;
+                  :}
+                  | declaration:d
+                     {: RESULT = new ExpList(d, null); :}
+                  ;
+
+declaration ::= var_declaration:vd
+               {: RESULT = vd; :}
+            | fun_declaration:fd
+               {: RESULT = fd; :}
+            | fun_prototype:fp
+               {: RESULT = fp; :}
+            ;
+
+var_declaration ::= type_specifier:ts ID:i SEMI
+                  {: RESULT = new VarDeclNode(tsleft, tsright, ts, i); :}
+                  | type_specifier:ts ID:i LBRACK NUM:n RBRACK SEMI
+                  {: RESULT = new ArrDeclNode(tsleft, tsright, ts, i, n); :}
+                  | type_specifier:ts ID:i LBRACK RBRACK SEMI
+                  {:
+                     System.err.println("Error: Missing array size at line " + tsleft + ", column " + tsright); 
+                     valid = false;
+                     RESULT = new ArrDeclNode(tsleft, tsright, ts, i, null); 
+                  :}
+                  | type_specifier:ts ID:i ASSIGN expression SEMI
+                  {: System.err.println("Error: Unable to declare a variable and assign a value in a single statement at line " + tsleft + ", column " + tsright);
+                     valid = false; 
+                     RESULT = new VarDeclNode(tsleft, tsright, ts, i); 
+                  :}
+                  ;
+
+type_specifier ::= BOOL:b
+                  {: RESULT = new NodeType(bleft, bright, NodeType.BOOL); :}
+               | INT:i
+                  {: RESULT = new NodeType(ileft, iright, NodeType.INT); :}
+               | VOID:v
+                  {: RESULT = new NodeType(vleft, vright, NodeType.VOID); :}
+               ;
+
+fun_declaration ::= type_specifier:ts ID:i LPAREN params:p RPAREN compound_stmt:cs
+                     {: RESULT = new FunDeclNode(tsleft, tsright, ts, i, p, cs); :}
+                  | type_specifier:ts ID:i LPAREN RPAREN compound_stmt:cs
+                     {: RESULT = new FunDeclNode(tsleft, tsright, ts, i, null, cs); :}
+                  ;
+
+fun_prototype ::= type_specifier:ts ID:i LPAREN params:p RPAREN SEMI
+                  {: RESULT = new FunProtoNode(tsleft, tsright, ts, i, p); :}
+               |  type_specifier:ts ID:i LPAREN RPAREN SEMI
+                  {: RESULT = new FunProtoNode(tsleft, tsright, ts, i, null); 
+                     System.err.println("Error: Missing arguments in function prototype " + ileft + ", column " + iright);
+                  :}
+               ;
+
+params ::= param_list:pl 
+            {: RESULT = pl; :}
+         | VOID:v
+            {: RESULT = null; :}
+         ;
+
+param_list ::= param_list:pl COMMA param:p 
+            {:ExpList t = pl;
+               while (t.tail != null)
+               {
+                  t = t.tail;
+               }
+               t.tail = new ExpList(p, null);
+               RESULT = pl;
+            :}
+            |
+            param:p
+            {:
+               RESULT = new ExpList(p, null);
+            :}
+            ;
+
+param ::= type_specifier:ts ID:i 
+         {: RESULT = new VarDeclNode(tsleft, tsright, ts, i); :}
+      | type_specifier:ts ID:i LBRACK RBRACK
+         {: RESULT = new ArrDeclNode(tsleft, tsright, ts, i, null); 
+            System.err.println("Error: No expression provided in IF statement at line " + ileft + ", column " + iright);
+         :}
+      ;
+
+compound_stmt ::= LBRACE:l local_declarations:ld statement_list:sl RBRACE
+                  {: RESULT = new CompoundStmtNode(lleft, lright, ld, sl); :}
+               ;
+
+local_declarations ::= local_declarations:ld var_declaration:v
+                     {:
+                        ExpList t = ld;
+                        RESULT = null;
+                        if(t != null)
+                        {
+                           while (t.tail != null)
+                           {
+                           t = t.tail;
+                           }
+                           if (v != null)
+                           {
+                           t.tail = new ExpList(v, null);
+                           }
+                           RESULT = ld;
+                        }
+                        else
+                        {
+                           if (v != null)
+                           {
+                           RESULT = new ExpList(v, null);
+                           }
+                        }
+                     :}
+                     |
+                     {:RESULT = null; :}
+                     ;
+
+statement_list ::= statement_list:sl statement:s 
+                  {:
+                     ExpList t = sl;
+                     RESULT = null;
+                     if (t != null)
+                     {
+                        while (t.tail != null)
+                        {
+                        t = t.tail;
+                        }
+                        if (s != null)
+                        {
+                        t.tail = new ExpList(s, null);
+                        }
+                        RESULT = sl;
+                     }
+                     else
+                     {
+                        if (s != null)
+                        {
+                        RESULT = new ExpList(s, null);
+                        }
+                     }
+                  :}
+                  |
+                  {:RESULT = null; :}
+                  ;
+
+statement ::= expression_stmt:e 
+               {: RESULT = e; :}
+            | compound_stmt:c 
+               {: RESULT = c; :}
+            | selection_stmt:s 
+               {: RESULT = s; :}
+            | iteration_stmt:i 
+               {: RESULT = i; :}
+            | return_stmt:r
+               {: RESULT = r; :}
+            ;
+
+expression_stmt ::= expression:e SEMI 
+                     {: RESULT = e; :}
+                  | SEMI;
+
+selection_stmt ::= IF:i LPAREN expression:e RPAREN statement:s ELSE statement:s2
+                  {: RESULT = new IfNode(ileft, iright, e, s, s2); :}
+               | IF:i LPAREN expression:e RPAREN statement:s1
+                  {: RESULT = new IfNode(ileft, iright, e, s1, null); :}
+               | IF:i LPAREN RPAREN statement:s ELSE statement:s2
+                  {: System.err.println("Error: No expression provided in IF statement at line " + ileft + ", column " + iright);
+                     valid = false;
+                     RESULT = new IfNode(ileft, iright, null, s, s2); :}
+               | IF:i LPAREN RPAREN statement:s1
+                  {: System.err.println("Error: No expression provided in IF statement at line " + ileft + ", column " + iright);
+                     valid = false;
+                     RESULT = new IfNode(ileft, iright, null, s1, null); :}
+               | IF:i LPAREN error RPAREN statement:s ELSE statement:s2
+                  {: System.err.println("Error: Invalid expression provided in IF statement at line " + ileft + ", column " + iright);
+                     valid = false;
+                     RESULT = new IfNode(ileft, iright, null, s, s2); :}
+               | IF:i LPAREN error RPAREN statement:s1
+                  {: System.err.println("Error: Invalid expression provided in IF statement at line " + ileft + ", column " + iright);
+                     valid = false;
+                     RESULT = new IfNode(ileft, iright, null, s1, null); :}      
+               ;
+
+iteration_stmt ::= WHILE:w LPAREN expression:e RPAREN statement:s
+                  {: RESULT = new WhileNode(wleft, wright, e, s); :}
+                  | WHILE:w LPAREN RPAREN statement:s
+                  {: System.err.println("Error: No expression provided in WHILE statement" + wleft + ", column " + wright);
+                     valid = false;
+                     RESULT = new WhileNode(wleft, wright, null, s); :}
+               ;
+
+return_stmt ::= RETURN:r expression:e SEMI
+               {: RESULT = new ReturnNode(rleft, rright, e); :}
+            | RETURN:r SEMI
+               {: RESULT = new ReturnNode(rleft, rright, null); :}
+            | RETURN:r expression:e
+               {: System.err.println("Error: Missing semicolon at line " + rleft + ", column " + rright);
+                  valid = false;
+                  RESULT = new ReturnNode(rleft, rright, e); :}
+            ;
+
+expression ::= var:v ASSIGN expression:e 
+               {: RESULT = new AssignNode(vleft, vright, v, e); :}
+               | expression:s1 OR expression:s2
+                  {: RESULT = new BinaryOpNode(s1left, s1right, s1, BinaryOpNode.OR, s2); :}
+               | expression:s1 AND expression:s2
+                  {: RESULT = new BinaryOpNode(s1left, s1right, s1, BinaryOpNode.AND, s2); :}
+               | expression:s1 LT expression:s2
+                  {: RESULT = new BinaryOpNode(s1left, s1right, s1, BinaryOpNode.LT, s2); :}
+               | expression:s1 LEQT expression:s2
+                  {: RESULT = new BinaryOpNode(s1left, s1right, s1, BinaryOpNode.LEQT, s2); :}
+               | expression:s1 GT expression:s2
+                  {: RESULT = new BinaryOpNode(s1left, s1right, s1, BinaryOpNode.GT, s2); :}
+               | expression:s1 GEQT expression:s2
+                  {: RESULT = new BinaryOpNode(s1left, s1right, s1, BinaryOpNode.GEQT, s2); :}
+               | expression:s1 EQ expression:s2
+                  {: RESULT = new BinaryOpNode(s1left, s1right, s1, BinaryOpNode.EQ, s2); :}
+               | expression:s1 NEQ expression:s2
+                  {: RESULT = new BinaryOpNode(s1left, s1right, s1, BinaryOpNode.NEQ, s2); :}
+               | expression:s1 PLUS expression:s2
+                  {: RESULT = new BinaryOpNode(s1left, s1right, s1, BinaryOpNode.PLUS, s2); :}
+               | expression:s1 MINUS expression:s2
+                  {: RESULT = new BinaryOpNode(s1left, s1right, s1, BinaryOpNode.MINUS, s2); :}
+               | expression:s1 TIMES expression:s2
+                  {: RESULT = new BinaryOpNode(s1left, s1right, s1, BinaryOpNode.TIMES, s2); :}
+               | expression:s1 OVER expression:s2
+                  {: RESULT = new BinaryOpNode(s1left, s1right, s1, BinaryOpNode.OVER, s2); :}
+               | UBW:ubw expression:e
+                  {: RESULT = new UnaryOpNode(ubwleft, ubwright, UnaryOpNode.UBW, e); :}
+               | MINUS:m expression:e
+                  {: RESULT = new BinaryOpNode(mleft, mright, null, BinaryOpNode.MINUS, e); :} 
+               | LPAREN expression:e RPAREN 
+                  {: RESULT = e; :}
+               | LPAREN:l error RPAREN
+                 {: System.err.println("Error: Invalid expression with parentheses at line " + lleft + ", column " + lright); 
+                    valid = false;
+                    RESULT = null; 
+                 :}
+               | call:c 
+                  {: RESULT = c; :}
+               | var:v 
+                  {: RESULT = v; :}
+               | NUM:n
+                  {: RESULT = new NumNode(nleft, nright, n); :}
+               | TRUTH:t
+                  {: RESULT = new TruthNode(tleft, tright, t); :}
+               | error:e
+                 {: System.err.println("Error: Invalid expression at line " + eleft + ", column " + eright); 
+                    RESULT = null; 
+                    valid = false;
+                 :}
+               ;
+
+var ::= ID:i
+         {: RESULT = new VarNode(ileft, iright, i); :}
+        | ID:i LBRACK expression:e RBRACK
+         {: RESULT = new ArrNode(ileft, iright, i, e); :};
+
+call ::= ID:i LPAREN args:a RPAREN
+         {: RESULT = new FunCallNode(ileft, iright, i, a); :}
+         ;
+
+args ::= arg_list:a
+         {: RESULT = a; :}
+      |
+         {: RESULT = (ExpList)null; :};
+
+arg_list ::= arg_list:a COMMA expression:e 
+            {:
+               ExpList t = a;
+               while (t.tail != null)
+               {
+                  t = t.tail;
+               }
+               t.tail = new ExpList( e, null );
+               RESULT = a;
+            :}
+            | expression:e
+               {: RESULT = new ExpList( e, null); :}
+             ;
+
+

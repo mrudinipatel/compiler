@@ -1,0 +1,37 @@
+// Variable declarations
+int x;
+bool flag;
+int arr[10];
+
+// Function prototype
+void compute(int value);
+
+// Function declaration
+void compute(int value) {
+    return;
+}
+
+// Main function
+void main() {
+    int i;
+    i = 0;
+
+    // Error 1: Redeclaration of variable
+    int x; // Semantic Error: Variable 'x' is already declared
+
+    // Error 2: Using an array without an index
+    arr = 5; // Semantic Error: Array 'arr' must be accessed with an index
+
+    // Error 3: Division by zero
+    x = 10 / 0; // Semantic Error: Division by zero is not allowed
+
+    // Error 4: Invalid condition in if statement
+    if (5) { // Semantic Error: Condition must be a boolean expression
+        x = 1;
+    }
+
+    // Error 5: Missing return statement in non-void function
+    int getValue() { // Semantic Error: Function must return an integer value
+        int y;
+    }
+}

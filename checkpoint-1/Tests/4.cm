@@ -1,0 +1,27 @@
+/*
+ * 4.cm tests float number expressions. Since the standard C- grammar
+ * excludes float numbers, these should always produce errors.
+*/
+
+/* Function returning a integer number (valid operation) */
+int returnInteger(void) {
+    int y; 
+    y = 2;
+    return y /*Missing semicolon*/
+}
+
+int main(void) {
+    int x;
+    x = 4 - 2;
+
+    if (x < 1) {   
+        returnIntegers();
+    } else if (4 - 1 == x) {
+        output(10 - 1);
+    } else {
+        int y[2];
+        y[0] = 2;
+
+        y[1] = returnInteger() - 10 - y[0] - 4 - returnInteger() + returnInteger();
+    }
+}

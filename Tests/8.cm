@@ -1,0 +1,15 @@
+/*
+ * This test file produces the following syntax and semantic errors:
+ * 1. Declaration of VOID array
+ * 2. Duplicate variable declaration
+*/
+
+void main (void) {
+    void a[10];
+
+    bool b;
+    bool b;
+
+    int x; 
+    x = 2 + 1 + 1;
+}

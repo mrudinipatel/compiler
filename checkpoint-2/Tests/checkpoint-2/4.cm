@@ -1,0 +1,29 @@
+/*
+ * 4.cm demonstrates a CM file with undefined symbols. It also tests scenarios
+ * where we have defined symbols and they get re-defined within the current scope.
+*/
+
+void nothing(void) { 
+    
+}
+
+int main(void) {
+    int w;
+    int x;
+    int y;
+
+    /* error: cannot redefine an already defined symbol within the same scope */
+    int y;
+
+    x = 2;
+    y = 3;
+
+    /* This should produce 2 errors */
+    /* error : cannot find the function symbol (case-sensitivity) AND we cannot determine the void type */
+    w = NOTHING(); 
+
+    if (x < y) {
+        /* valid since x is not already pre-defined in this scope */
+        int x;
+    }
+}

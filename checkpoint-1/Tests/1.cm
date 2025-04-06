@@ -1,0 +1,47 @@
+/*
+ * 1.cm tests the parser's ability to handle valid C- syntax.
+ * (e.g., the program's happy path).
+ * 
+ * This test makes use of function calls, accesses return values, calculates
+ * mathematical/relational expressions, comments, and arrays -- all of which is 
+ * supported by standard C- grammar.
+*/
+
+int calc(int x) {
+    return x + 4 * 3;
+}
+
+void print(int message, int count) {
+    int i;
+    i = 0;
+
+    while (i < count) {
+        output(message);
+        i = i + 1;
+    }
+
+    if (count < 0) {
+        /* This is a test comment :D */
+        count = 0 - count;
+    }
+}
+
+int main(void) {
+    int i; 
+    int count;
+    int x[10];
+    int y;
+    int z;
+
+    i = 1;
+    count = input();
+    x[0] = 1;
+    y = input();
+    z = calc(y);
+
+    while (i < 10) {
+        x[i] = x[i-1] + z / 2;
+    }
+
+    print(x[9] * (12 - 5 / 2), count);
+}

@@ -1,0 +1,15 @@
+/*
+ * 3.cm tests invalid if statements.
+*/
+
+int main(void) {
+    /* Invalid condition passed into if expression*/
+    if (while) {
+        output(1);
+    }
+
+    /* No if-condition present in expression */
+    if () {
+        output(2);
+    }
+}

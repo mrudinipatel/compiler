@@ -1,0 +1,29 @@
+/*
+ * This test file is error-free and aims to show valid function calls 
+ * and conditional expressions. The 'small' function finds the smallest 
+ * value amongst those passed to it and the main method outputs this value. 
+*/
+
+int small(int x, int y, int z){
+	int smol;
+	smol = x;
+
+	if (z < smol)
+		smol = z;
+
+	if (y < smol)
+		smol = y;
+
+	return smol;
+}
+
+void main (void){
+  int a; 
+  int b; 
+  int c;
+  a = 4;
+  b = 8;
+  c = 32;
+
+  output(small(a, b,c));
+}

@@ -1,0 +1,6 @@
+{
+    "makefile.configureOnOpen": false,
+    "java.project.referencedLibraries": [
+        "/Users/williamborruat/compilers/java-cup-bin-11b/java-cup-11b.jar"
+    ]
+}

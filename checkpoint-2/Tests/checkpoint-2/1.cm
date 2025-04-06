@@ -1,0 +1,49 @@
+/* 
+ * 1.cm is a test that demonstrates a fully 
+ * functioning CM file with no existing semantic errors.
+ * This is expected to compile without any errors.
+*/
+
+void math(int x, int y, int z) {
+    output(x + y * (z/2));
+}
+
+void foo(void) {
+    output(1);
+    return;
+}
+
+int increment(int x) {
+    return x + 1;
+}
+
+int main(void) {
+    int i;
+    int x; int y;
+    int z[8];
+
+    x = 5;
+    y = 4;
+
+    if (x > y) {
+        int f;
+        f = 5;
+        z[0] = f;
+    } else if (x == y) {
+        z[0] = increment(x) + increment(y);
+    } else {
+        /* when x is less than y */
+        z[0] = increment(y + x);
+    }
+
+    i = 0;
+    while (i < 7) {
+        foo();
+        z[1] = i;
+        i = increment(i);
+    }
+
+    math(x, y, z[7]);
+
+    return 0;
+}

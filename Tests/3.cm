@@ -1,0 +1,43 @@
+/*
+ * This test file is error-free and demonstrates valid operations 
+ * on arrays as well as the valid evaluation of expressions 
+ * (e.g., initializing indices to 0 and assign values at other indices 
+ * before outputting these assignments to confirm accuracy).
+ * It also showcases how comments are ignored in the code. 
+*/
+
+int arr[10];
+
+/* Print the array */
+void printArr(void){
+	int x;
+	x = 0;
+
+	while (x < 10){
+		output(arr[x]);
+	}
+}
+
+/* Set array values to zero */
+void initializeToZero(void){
+	int x;
+	x = 0;
+
+	while (x < 10){
+		arr[x] = 0;
+		x = x + 1;
+	}
+}
+
+void main(void) {
+	int exp;
+	initializeToZero();
+	exp = (5 * 4) / 10;
+
+    /* arr[2] = 2 */
+	arr[exp] = exp;
+
+    /* arr[4] = 16 */
+	arr[4*4*4/16] = 100 / 50 - 2 + 8 * 2;
+	printArr();
+}

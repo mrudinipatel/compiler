@@ -1,0 +1,23 @@
+/*
+ * This test file produces the following semantic errors:
+ * 1. Declaration of a void variable
+ * 2. Declaration a function without any parameters
+ * 3. Tries to utilize an undefined variable
+*/
+
+/* Warning for void variable declaration */
+void x;
+
+void main (void) {
+  int x;
+  int y;
+
+  /* Undefined variable */
+  z = 2;
+}
+
+/* Error for  wrong function syntax */
+void func() {
+  int x;
+  return x;
+}

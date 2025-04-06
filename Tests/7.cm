@@ -1,0 +1,23 @@
+/*
+ * This test file produces the following syntax and semantic errors:
+ * 1. Mismatch operands in binary comparision operation (integer and boolean)
+ * 2. If statement with invalid test conditions (void)
+ * 3. Mismatch operands in binary arithmetic operation (integer and boolean)
+*/
+
+void voidFunc (void){
+
+}
+
+void main (void) {
+    int x;
+    int y; 
+    bool z;
+
+    if(voidFunc()){
+        x = x + 1;
+    }
+
+    y = x + z;
+    z = 1 + true;
+}

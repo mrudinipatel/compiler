@@ -1,0 +1,157 @@
+/*
+  Created by: Fei Song
+  File Name: tiny.cup
+*/
+   
+   
+/* ----------------------Preliminary Declarations Section--------------------*/
+   
+import absyn.*;
+   
+/* Parser code to change the way the parser reports errors (include
+   line and column number of the error). */
+parser code {:
+    
+    /* Change the method report_error so it will display the line and
+       column of where the error occurred in the input as well as the
+       reason for the error which is passed into the method in the
+       String 'message'. */
+    public void report_error(String message, Object info) {
+   
+        /* Create a StringBuffer called 'm' with the string 'Error' in it. */
+        StringBuffer m = new StringBuffer("Error");
+   
+        /* Check if the information passed to the method is the same
+           type as the type java_cup.runtime.Symbol. */
+        if (info instanceof java_cup.runtime.Symbol) {
+            /* Declare a java_cup.runtime.Symbol object 's' with the
+               information in the object info that is being typecasted
+               as a java_cup.runtime.Symbol object. */
+            java_cup.runtime.Symbol s = ((java_cup.runtime.Symbol) info);
+   
+            /* Check if the line number in the input is greater or
+               equal to zero. */
+            if (s.left >= 0) {                
+                /* Add to the end of the StringBuffer error message
+                   the line number of the error in the input. */
+                m.append(" in line "+(s.left+1));   
+                /* Check if the column number in the input is greater
+                   or equal to zero. */
+                if (s.right >= 0)                    
+                    /* Add to the end of the StringBuffer error message
+                       the column number of the error in the input. */
+                    m.append(", column "+(s.right+1));
+            }
+        }
+   
+        /* Add to the end of the StringBuffer error message created in
+           this method the message that was passed into this method. */
+        m.append(" : "+message);
+   
+        /* Print the contents of the StringBuffer 'm', which contains
+           an error message, out on a line. */
+        System.err.println(m);
+    }
+   
+    /* Change the method report_fatal_error so when it reports a fatal
+       error it will display the line and column number of where the
+       fatal error occurred in the input as well as the reason for the
+       fatal error which is passed into the method in the object
+       'message' and then exit.*/
+    public void report_fatal_error(String message, Object info) {
+        report_error(message, info);
+        System.exit(1);
+    }
+
+    /* Assume true at the start, but set to false with parsing errors */
+    public static boolean valid = true;
+
+:};
+   
+   
+/* ------------Declaration of Terminals and Non Terminals Section----------- */
+   
+terminal IF, THEN, ELSE, END, REPEAT, UNTIL, READ, WRITE;
+terminal ASSIGN, EQ, LT, GT, PLUS, MINUS, TIMES, OVER, LPAREN, RPAREN, SEMI;
+terminal ID, NUM, TRUTH;
+terminal ERROR;
+terminal BOOL, INT, RETURN, VOID, WHILE, TRUE, FALSE, LEQT, GEQT, NEQ, UBW, OR, AND, COMMA, LBRACK, RBRACK, LBRACE, RBRACE;
+   
+non terminal Exp program1;
+non terminal ExpList program, declaration_list, param_list, statement_list, arg_list;
+non terminal Exp declaration, var_declaration, type_specifier, fun_declaration, fun_prototype, param, compound_stmt, local_declarations, statement, expression_stmt, selection_stmt, iteration_stmt, return_stmt, expression, var, obool_expression, abool_expression, ubool_expression, simple_expression, relop, additive_expression, addop, term, mulop, signed_factor, factor, call, args;
+
+/* ----------------------------Grammar Section-------------------- */
+   
+start with program;
+
+program ::= declaration_list;
+
+declaration_list ::= declaration_list declaration | declaration;
+
+declaration ::= var_declaration | fun_declaration | fun_prototype;
+
+var_declaration ::= type_specifier ID SEMI | type_specifier ID LBRACK NUM RBRACK SEMI;
+
+type_specifier ::= BOOL | INT | VOID
+
+fun_declaration ::= type_specifier ID LPAREN params RPAREN compound_statement;
+
+fun_prototype ::= type_specifier ID LPAREN params RPAREN;
+
+params ::= param_list | VOID;
+
+param_list ::= param_list COMMA param | param;
+
+param ::= type_specifier ID | type_specifier ID LBRACK RBRACK;
+
+compound_stmt ::= LBRACE local_declarations statement_list RBRACE;
+
+local_declarations ::= local_declarations var_declaration | ;
+
+statement_list ::= statement | ;
+
+statement ::= expression_statement | compound_stmt | selection_stmt | iteration stmt | return stmt;
+
+expression_stmt ::= expression SEMI | SEMI;
+
+selection_stmt ::= IF LPAREN expression RPAREN statement | IF LPAREN expression RPAREN statement ELSE statement;
+
+iteration_stmt ::= WHILE LPAREN expression RPAREN statement;
+
+return stmt ::= RETURN expression SEMI | RETURN SEMI;
+
+expression ::= var ASSIGN expression SEMI | obool_expression;
+
+var ::= ID | ID LBRACK expression RBRACK;
+
+obool_expression ::= obool_expression OR abool_expression | abool_expression;
+
+abool_expression ::= abool_expression AND ubool_expression | ubool_expression;
+
+ubool_expression ::= UBW ubool_expression | simple_expression;
+
+simple_expression ::= additive_expression relop additive_expression | additive_expression;
+
+relop ::= LEQT | LT | GT | GEQT | EQ | DNE;
+
+additive_expression ::= additive_expression addop term | term;
+
+addop ::= PLUS | MINUS;
+
+term ::= term mulop signed_factor | signed_factor;
+
+mulop ::= TIMES | OVER;
+
+signed_factor ::= signed_factor | factor;
+
+factor ::= LPAREN expression RPAREN | var | call | NUM | TRUTH
+
+call ::= ID LPAREN args RPAREN;
+
+args ::= arg_list | ;
+
+arg_list ::= arg_list COMMA expression | expression;
+
+
+

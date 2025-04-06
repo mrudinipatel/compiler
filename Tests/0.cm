@@ -1,0 +1,34 @@
+// Variable declarations
+int x;
+bool flag;
+int arr[10];
+
+// Function prototype
+void print(int value);
+
+// Function declaration
+void print(int value) {
+    return;
+}
+
+// Main function
+void main() {
+    int i;
+    i = 0;
+    flag = true;
+
+    // Error 1: Using undeclared variable
+    y = 10; // Semantic Error: Variable 'y' is not declared
+
+    // Error 2: Type mismatch in assignment
+    flag = 42; // Semantic Error: Assigning an isnteger to a boolean variable
+
+    // Error 3: Array index out of bounds
+    arr[20] = 5; // Semantic Error: Array index exceeds declared size (10)
+
+    // Error 4: Missing semicolon
+    x = i + 1 // Syntax Error: Missing semicolon at the end of the statement
+
+    // Error 5: Invalid function call
+    print(); // Semantic Error: Function 'print' requires 1 argument, but 0 were provided
+}

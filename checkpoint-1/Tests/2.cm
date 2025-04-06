@@ -1,0 +1,21 @@
+/*
+ * 2.cm tests syntactic errors related to function and variable 
+ * definition.
+*/
+
+/* Case of an invalid return type */
+int returnError(void) {
+    return 0;
+}
+
+/* Case of a missing or void parameter */
+void paramError(void) {
+    return;
+}
+
+/* Cannot define AND assign a variable in the same statement! */
+int main(void) {
+    int x = 8; /*Declaration and assignment in a single command*/
+    int y[4] = {0, 1, 2, 3}; /*Improper syntax (braces)*/
+    return 0;
+}
