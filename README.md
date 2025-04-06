@@ -1,10 +1,5 @@
 # Compiler ⚙️
 
-## Details 
-- **Course Code:** CIS*4650 
-- **Professor:** Fei Song  
-- **Author:** Group 5: William Borruat, Mrudini Patel, Chetram Sanichar
-
 
 ## Project Overview 📋
 
@@ -40,24 +35,36 @@ Please note, that this program's type checking contains non-exhaustive coverage.
 
 ## Deployment 🚀 
 
-The steps below assume that Jflex and CUP are preinstalled on your machine.  
+The steps below assume that Jflex and CUP are preinstalled on your machine. Open terminal in your working directory and run:   
 
-Open terminal in your working directory and run:   
+`make all`  
+This compiles the program and creates all necessary files.  
 
-`make all` - This compiles the program and creates all necessary files.  
+`java -cp [path to CUP .jar] Scanner < 'filename.cm'`   
+This runs the scanner with the file provided and prints any relevant tokens to stdout and any errors to stderr. 
 
-`java -cp [path to CUP .jar] Scanner < 'filename.cm'`- This runs the scanner with the file provided and prints any relevant tokens to stdout and any errors to stderr. 
+`java -cp [path to CUP .jar] CM 'filename.cm' -a`   
+This runs the parser with the file provided and sends the output to a `filename.abs` file. 
 
-`java -cp [path to CUP .jar] CM 'filename.cm' -a` - This runs the parser with the file provided and sends the output to a `filename.abs` file. 
+`java -cp [path to CUP .jar] CM 'filename.cm' -s`   
+This runs the parser and creates the symbol table. It will also send the output to `filename.abs` and `filename.sym` files. 
 
-`java -cp [path to CUP .jar] CM 'filename.cm' -s` - This runs the parser and creates the symbol table. It will also send the output to `filename.abs` and `filename.sym` files. 
+`java -cp [path to CUP .jar] CM 'filename.cm' -c`   
+This runs the code generator and sends all output and steps of the compiler (e.g., assembly code) to a `filename.tm` file.  
 
-`java -cp [path to CUP .jar] CM 'filename.cm' -c` - This runs the code generator and sends all output and steps of the compiler (e.g., assembly code) to a `filename.tm` file.  
-
-`make clean` - This cleans all compilation in your working directory.  
+`make clean`  
+This cleans all compilation in your working directory.  
 
 
 ## Future Improvements 🔮
 
 - Implement remaining code generation, as all visitor functions are not yet fully implemented.  
 - Implement a code optimization component which could be an interesting addition to this project for the future.  
+
+
+## Team Members 💻
+- William Borruat  
+- Mrudini Patel  
+- Chetram Sanichar
+
+This project was created for CIS*4650 taught by Professor Fei Song in W25.
